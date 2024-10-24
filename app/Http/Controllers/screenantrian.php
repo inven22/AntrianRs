@@ -81,8 +81,7 @@ class screenantrian extends Controller
                 'poliJaminan' => 'Error',
             ]);
         }
-
-        // Return view dengan data antrian yang diperoleh dari API Odoo
+        
         return view('antrian.baris', [
             'antrianUmum' => $antrianUmum,
             'antrianJaminan' => $antrianJaminan,
