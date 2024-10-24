@@ -193,24 +193,29 @@
 <center><div class="main-content">
     <div class="container">
         <div class="queue-row">
-            <div class="col-md-5">
-                <div class="queue-container">
-                    <h3>ANTRIAN PASIEN BPJS</h3>
-                    <p class="mb-2">Nomor Antrian</p>
-                    <p class="queue-number pulse" id="bpjs-queue">P06</p>
-                    <p class="mt-3">POLI THT</p>
-                    <button class="btn-speak" onclick="speakQueue('bpjs')">Panggil Antrian BPJS</button>
+            @if($antrianJaminan != 'N/A' && $poliJaminan != 'N/A')
+                <div class="col-md-5">
+                    <div class="queue-container">
+                        <h3>ANTRIAN PASIEN BPJS</h3>
+                        <p class="mb-2">Nomor Antrian</p>
+                        <p class="queue-number pulse" id="bpjs-queue">{{ $antrianJaminan }}</p>
+                        <p class="mt-3">{{ $poliJaminan }}</p>
+                        <button class="btn-speak" onclick="speakQueue('bpjs')">Panggil Antrian BPJS</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-5">
-                <div class="queue-container">
-                    <h3>ANTRIAN PASIEN UMUM</h3>
-                    <p class="mb-2">Nomor Antrian</p>
-                    <p class="queue-number pulse" id="umum-queue">U07</p>
-                    <p class="mt-3">POLI MULUT</p>
-                    <button class="btn-speak" onclick="speakQueue('umum')">Panggil Antrian Umum</button>
+                @endif
+
+                @if($antrianUmum != 'N/A' && $poliUmum != 'N/A')
+                <div class="col-md-5">
+                    <div class="queue-container">
+                        <h3>ANTRIAN PASIEN UMUM</h3>
+                        <p class="mb-2">Nomor Antrian</p>
+                        <p class="queue-number pulse" id="umum-queue">{{ $antrianUmum }}</p>
+                        <p class="mt-3">{{ $poliUmum }}</p>
+                        <button class="btn-speak" onclick="speakQueue('umum')">Panggil Antrian Umum</button>
+                    </div>
                 </div>
-            </div>
+                @endif
         </div>
     </div>
 </div></center>
