@@ -17,3 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/antrian', [App\Http\Controllers\screenantrian::class, 'index']);
+Route::post('/speak', [App\Http\Controllers\screenantrian::class, 'speakQueue']);

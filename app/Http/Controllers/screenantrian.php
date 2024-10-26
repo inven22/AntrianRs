@@ -23,7 +23,7 @@ class screenantrian extends Controller
                 ],
             ]);
 
-            Log::info('Request ke API antrian umum berhasil', [
+            Log::info('Request ke API antrian umum berhasildsadaadasd', [
                 'url' => $antrianUmumUrl,
                 'status_code' => $responseUmum->getStatusCode()
             ]);
@@ -78,5 +78,25 @@ class screenantrian extends Controller
             'poliUmum' => $poliUmum,
             'poliJaminan' => $poliJaminan,
         ]);
+    }
+
+    public function speakQueue(Request $request)
+    {
+        $type = $request->input('type');
+        $queueNumber = $request->input('queueNumber');
+        $poli = $type === 'bpjs' ? 'POLI THT' : 'POLI MULUT';
+        $message = "Nomor antrian {$queueNumber}, silahkan menuju {$poli}";
+        Log::info('speakQueue API called', [
+            'type' => $type,
+            'queueNumber' => $queueNumber,
+            'poli' => $poli,
+            'message' => $message
+        ]);
+       
+        return response()->json(['message' => $message]);
+    }
+    public function helo(){
+        Log::info('API Pemeriksaan Dokter terpanggil.');
+        return view('hala');
     }
 }
