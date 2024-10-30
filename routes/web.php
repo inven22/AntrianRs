@@ -17,6 +17,6 @@ use Illuminate\Support\Facades\Route;
 //     return view('antrian.baris');
 // });
  
-Route::get('/', [App\Http\Controllers\screenantrian::class, 'index']);
+Route::get('/', [App\Http\Controllers\screenantrian::class, 'index'])->name('index');
 Route::get('/helo', [App\Http\Controllers\screenantrian::class, 'helo']);
 Route::get('layout', [App\Http\Controllers\layouts::class, 'layouts']);

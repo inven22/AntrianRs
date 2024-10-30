@@ -199,7 +199,7 @@
                         <h3>ANTRIAN PASIEN BPJS</h3>
                         <p class="mb-2">Nomor Antrian</p>
                         <p class="queue-number pulse" id="bpjs-queue">{{ $antrianJaminan }}</p>
-                        <p class="mt-3">{{ $poliJaminan }}</p>
+                        <p class="mt-3" id="poli-bpjs">{{ $poliJaminan }}</p>
                         <button class="btn-speak" onclick="speakQueue('bpjs')">Panggil Antrian BPJS</button>
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                         <h3>ANTRIAN PASIEN UMUM</h3>
                         <p class="mb-2">Nomor Antrian</p>
                         <p class="queue-number pulse" id="umum-queue">{{ $antrianUmum }}</p>
-                        <p class="mt-3">{{ $poliUmum }}</p>
+                        <p class="mt-3" id="poli-umum">{{ $poliUmum }}</p>
                         <button class="btn-speak" onclick="speakQueue('umum')">Panggil Antrian Umum</button>
                     </div>
                 </div>
@@ -273,31 +273,159 @@
         }, 300);
     }
 
+    // function speakQueue(type) {
+    //     let queueNumber, poli;
+    //     if (type === 'bpjs') {
+    //         queueNumber = document.getElementById('bpjs-queue').textContent;
+    //         poli = 'POLI THT';
+    //     } else {
+    //         queueNumber = document.getElementById('umum-queue').textContent;
+    //         poli = 'POLI MULUT';
+    //     }
+
+    //     const message = `Nomor antrian ${queueNumber}, silahkan menuju ${poli}`;
+        
+    //     // Check if browser supports speech synthesis
+    //     if ('speechSynthesis' in window) {
+    //         const speech = new SpeechSynthesisUtterance(message);
+    //         speech.lang = 'id-ID'; // Set language to Indonesian
+    //         speech.rate = 0.9; // Slightly slower rate for clarity
+    //         speech.pitch = 1;
+    //         window.speechSynthesis.speak(speech);
+    //     } else {
+    //         alert('Maaf, browser Anda tidak mendukung fitur text-to-speech.');
+    //     }
+    // }
+
+    // Maintain a set of called queues
+    const calledQueues = new Set();
+
     function speakQueue(type) {
         let queueNumber, poli;
+
         if (type === 'bpjs') {
             queueNumber = document.getElementById('bpjs-queue').textContent;
-            poli = 'POLI THT';
+            poli = document.getElementById('poli-bpjs').textContent;
         } else {
             queueNumber = document.getElementById('umum-queue').textContent;
-            poli = 'POLI MULUT';
+            poli = document.getElementById('poli-umum').textContent;
         }
 
-        const message = `Nomor antrian ${queueNumber}, silahkan menuju ${poli}`;
-        
-        // Check if browser supports speech synthesis
-        if ('speechSynthesis' in window) {
-            const speech = new SpeechSynthesisUtterance(message);
-            speech.lang = 'id-ID'; // Set language to Indonesian
-            speech.rate = 0.9; // Slightly slower rate for clarity
-            speech.pitch = 1;
-            window.speechSynthesis.speak(speech);
-        } else {
-            alert('Maaf, browser Anda tidak mendukung fitur text-to-speech.');
+        // Check if the queue number has already been called
+        if (!calledQueues.has(queueNumber)) {
+            const message = `Nomor antrian ${queueNumber}, silahkan menuju ${poli}`;
+
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(message);
+                speech.lang = 'id-ID';
+                speech.rate = 0.9;
+                speech.pitch = 1;
+                window.speechSynthesis.speak(speech);
+
+                // Mark the queue number as called
+                calledQueues.add(queueNumber);
+            } else {
+                alert('Maaf, browser Anda tidak mendukung fitur text-to-speech.');
+            }
         }
     }
 
-    // Initialize
+
+    // function speakQueue(type) {
+    //     let url = `/api/speak`; // Ubah sesuai endpoint API Laravel Anda
+
+    //     // Kirim request ke backend Laravel
+    //     fetch(url, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRF-TOKEN': '{{ csrf_token() }}' // CSRF untuk Laravel
+    //         },
+    //         body: JSON.stringify({ type: type })
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         const message = data.message;
+
+    //         // Jalankan Text-to-Speech menggunakan pesan dari Laravel
+    //         if ('speechSynthesis' in window) {
+    //             const speech = new SpeechSynthesisUtterance(message);
+    //             speech.lang = 'id-ID'; // Bahasa Indonesia
+    //             speech.rate = 0.9; // Kecepatan bicara
+    //             speech.pitch = 1;   // Nada bicara
+    //             window.speechSynthesis.speak(speech);
+    //         } else {
+    //             alert('Maaf, browser Anda tidak mendukung fitur text-to-speech.');
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error:', error);
+    //     });
+    // }
+
+
+       
+        // try {
+        //     const response = await fetch("http://localhost:8069/api/antrian_umum");
+        //     if (!response.ok) throw new Error("Network response was not ok");
+
+        //     const data = await response.json();
+        //     console.log("Queue data:", data);
+            
+        // } catch (error) {
+        //     console.error("Error fetching queue data:", error);
+        // }
+    async function fetchQueueData() {
+        
+        try {
+            const response = await fetch("http://localhost:8069/api/antrian_umum");
+            if (!response.ok) throw new Error("Network response was not ok");
+
+            const data = await response.json();
+            console.log("Queue data:", data);
+
+            if (data.data && data.data.length > 0) {
+                const queueData = data.data[0];
+                
+                document.getElementById("umum-queue").textContent = queueData.no_appointment || "N/A";
+                document.getElementById("poli-umum").textContent = queueData.poli || "N/A";
+                if (queueData.state === 'panggil_pasien') {
+                    speakQueue('umum');
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching queue data:", error);
+        }
+    }
+
+    async function fetchQueueDataJaminan() {
+        
+        try {
+            const response = await fetch("http://localhost:8069/api/antrian_jaminan");
+            if (!response.ok) throw new Error("Network response was not ok");
+
+            const data = await response.json();
+            console.log("Queue data BPJS:", data);
+
+            if (data.data && data.data.length > 0) {
+                const queueData = data.data[0];
+                
+                document.getElementById("bpjs-queue").textContent = queueData.no_appointment || "N/A";
+                document.getElementById("poli-bpjs").textContent = queueData.poli || "N/A";
+                if (queueData.state === 'panggil_pasien') {
+                    speakQueue('bpjs');
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching queue data:", error);
+        }
+    }
+
+    fetchQueueData();
+    setInterval(fetchQueueData, 1000);
+    fetchQueueDataJaminan();
+    setInterval(fetchQueueDataJaminan, 1000);
+    
     updateDateTime();
     setInterval(updateDateTime, 60000);
     updateQueueNumbers();
